@@ -1,13 +1,42 @@
-import React from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text } from 'react-native';
 import { GiftedChat } from 'react-native-gifted-chat';
 import { styles } from '../styles/styles';
 
 export default function Chat(props) {
 
-  let { name } = props.route.params;
-  let { bgColor } = props.route.params;
-  props.navigation.setOptions({ title: name }, { backgroundColor: bgColor })
+  const [messages, setMessages] = useState([]);
+
+  let { name, bgColor } = props.route.params;
+
+  props.navigation.setOptions({ title: name })
+
+  //run once after component mounts
+  useEffect(() => {
+    setMessages([
+      {
+        _id: 1,
+        text: 'Hello developer',
+        areatedAt: new Date(),
+        user: {
+          _id: 2,
+          name: 'React Native',
+          avatar: 'https://placeimg.com/140/140/any'
+        }
+      },
+      {
+        _id: 2,
+        text: 'This is a system message',
+        createdAt: new Date(),
+        system: true,
+      },
+    ])
+  }, [])
+
+  //Message gets appended to the GiftedChat
+  const onSend = useCallback((messages = []) => {
+    setMessages(previousMessages => GiftedChat.append(previousMessages, messages))
+  }, [])
 
   return (
     <View style={{
@@ -16,10 +45,15 @@ export default function Chat(props) {
       alignItems: 'center',
       backgroundColor: bgColor
     }}>
-      <View style={{ flex: 20 }}>
-        <Text style={styles.chat_title}>Hello, {name}</Text>
+      <View style={{ flex: 80 }}>
+        <GiftedChat
+          messages={messages}
+          onSend={messages => onSend(messages)}
+          user={{
+            _id: 1,
+          }}
+        />
       </View>
-      <View style={{ flex: 80 }}></View>
 
     </View>
   )

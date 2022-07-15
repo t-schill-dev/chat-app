@@ -52,7 +52,7 @@ export default function Home(props) {
         {/* Utilize navigation prop from React Navigation library to switch screens */}
         <Pressable
           style={styles.button}
-          onPress={() => props.navigation.navigate('Chat', { name: name }, { backgroundColor: bgColor })}>
+          onPress={() => props.navigation.navigate('Chat', { name: name }, { bgColor: bgColor })}>
           <Text style={styles.button_text}>Start Chatting</Text>
         </Pressable>
 

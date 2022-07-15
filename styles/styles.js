@@ -72,13 +72,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     // ----------------- CHAT SCREEN -----------------
-    chat_title: {
-        position: 'relative',
-        top: 20,
-        fontSize: 30,
-        fontWeight: '600',
-        color: '#C4D7E0'
-    }
+    // chat_title: {
+    //     position: 'relative',
+    //     top: 20,
+    //     fontSize: 30,
+    //     fontWeight: '600',
+    //     color: '#C4D7E0'
+    // }
 });
 
 export { styles };
