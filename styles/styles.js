@@ -25,6 +25,7 @@ const styles = StyleSheet.create({
         padding: 10,
     },
     input: {
+
         height: 40,
         width: '88%',
         borderWidth: 1,
@@ -36,6 +37,7 @@ const styles = StyleSheet.create({
         padding: 10
     },
     select: {
+
         fontSize: 16,
         fontWeight: '300',
         color: '#757083'

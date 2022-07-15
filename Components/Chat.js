@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text } from 'react-native';
+import { GiftedChat } from 'react-native-gifted-chat';
 import { styles } from '../styles/styles';
 
 export default function Chat(props) {
