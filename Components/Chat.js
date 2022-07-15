@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { View, Platform, KeyboardAvoidingView } from 'react-native';
-import { GiftedChat } from 'react-native-gifted-chat';
+import { GiftedChat, Bubble } from 'react-native-gifted-chat';
 import { styles } from '../styles/styles';
 
 export default function Chat(props) {
@@ -38,12 +38,25 @@ export default function Chat(props) {
     setMessages(previousMessages => GiftedChat.append(previousMessages, messages))
   }, [])
 
+  const renderBubble = function (props) {
+    return (
+      <Bubble
+        {...props}
+        wrapperStyle={{
+          right: {
+            backgroundColor: '#000'
+          }
+        }}
+      />
+    )
+  }
   return (
     <View style={{
       flex: 1,
       backgroundColor: bgColor
     }}>
       <GiftedChat
+        renderBubble={renderBubble}
         messages={messages}
         onSend={messages => onSend(messages)}
         user={{
