@@ -79,6 +79,12 @@ const styles = StyleSheet.create({
     //     fontWeight: '600',
     //     color: '#C4D7E0'
     // }
+    sendContainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        alignSelf: 'center',
+        marginRight: 10,
+    }
 });
 
 export { styles };
