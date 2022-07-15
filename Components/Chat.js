@@ -8,7 +8,7 @@ export default function Chat(props) {
   const [messages, setMessages] = useState([]);
 
   let { name, bgColor } = props.route.params;
-
+  // Declare the title of the Chat UI being the name prop
   props.navigation.setOptions({ title: name })
 
   //run once after component mounts
@@ -38,6 +38,7 @@ export default function Chat(props) {
     setMessages(previousMessages => GiftedChat.append(previousMessages, messages))
   }, [])
 
+  //Changing color by inheriting props of function
   const renderBubble = function (props) {
     return (
       <Bubble

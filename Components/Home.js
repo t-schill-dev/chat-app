@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ImageBackground, View, Text, TextInput, TouchableOpacity, Pressable, Platform, KeyboardAvoidingView } from 'react-native';
+import { ImageBackground, View, Text, TextInput, TouchableOpacity, Pressable, } from 'react-native';
 import BackgroundImage from '../img/background_image.png';
 import { styles } from '../styles/styles';
 
@@ -31,6 +31,7 @@ export default function Home(props) {
           placeholder='Your name'
         />
         <Text style={styles.select}>Choose background color:</Text>
+        {/* Create container with colors to pick for the chat screen. Set to values of the colors array and invoking state change */}
         <View style={styles.colorContainer}>
           <TouchableOpacity
             style={[{ backgroundColor: colors.black }, styles.colorbutton]}
@@ -49,14 +50,14 @@ export default function Home(props) {
             onPress={() => setBgColor(colors.green)}
           />
         </View>
-        {/* Utilize navigation prop from React Navigation library to switch screens */}
+        {/* Button to utilize navigation prop from React Navigation library to switch screens */}
         <Pressable
           style={styles.button}
+          // Function passes name and color prop to Chat component
           onPress={() => props.navigation.navigate('Chat', { name: name }, { bgColor: bgColor })}>
           <Text style={styles.button_text}>Start Chatting</Text>
         </Pressable>
-        {Platform.OS === 'android' ? <KeyboardAvoidingView behavior="height" /> : null
-        }
+
       </View>
     </View>
   )
