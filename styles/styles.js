@@ -8,17 +8,19 @@ const styles = StyleSheet.create({
 
     },
     title: {
-        flex: 10,
-
+        position: 'relative',
+        top: 40,
         fontSize: 45,
         fontWeight: '600',
         color: '#FFFFFF'
     },
     input_wrapper: {
         flex: 44,
+        position: 'relative',
+        bottom: 20,
         width: '88%',
         justifyContent: 'space-evenly',
-        alignItems: 'start',
+        alignItems: 'center',
         backgroundColor: 'white',
         padding: 10,
     },
@@ -30,7 +32,8 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '300',
         color: '#757083',
-        opacity: 50
+        opacity: 50,
+        padding: 10
     },
     select: {
         fontSize: 16,
@@ -47,19 +50,32 @@ const styles = StyleSheet.create({
         height: 40,
         borderRadius: 20,
     },
-    button: {
-        height: 50,
-        width: '88%',
-        justifyContent: 'center',
-        alignItems: 'center',
+    button_text: {
+        color: '#FFFFFF',
         fontSize: 16,
-        backgroundColor: 'green'
+        fontWeight: '600'
+    },
+    button: {
+        height: 40,
+        width: '88%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '88%',
+        backgroundColor: '#757083'
     },
     image: {
         flex: 1,
         flexDirection: 'column',
         justifyContent: 'space-evenly',
         alignItems: 'center',
+    },
+    // ----------------- CHAT SCREEN -----------------
+    chat_title: {
+        position: 'relative',
+        top: 20,
+        fontSize: 30,
+        fontWeight: '600',
+        color: '#C4D7E0'
     }
 });
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ImageBackground, View, Text, Button, TextInput, TouchableOpacity } from 'react-native';
+import { ImageBackground, View, Text, TextInput, TouchableOpacity, Pressable } from 'react-native';
 import BackgroundImage from '../img/background_image.png';
 import { styles } from '../styles/styles';
 
@@ -12,7 +12,7 @@ const colors = {
 
 export default function Home(props) {
   const [name, setName] = useState('');
-  const [color, setColor] = useState('');
+  const [bgColor, setBgColor] = useState('black');
 
   return (
     <View style={styles.container}>
@@ -20,7 +20,9 @@ export default function Home(props) {
         source={BackgroundImage}
         resizeMode='cover'
         style={styles.image} />
-      <Text style={styles.title}>What's Up?</Text>
+      <View style={{ flex: 55 }}>
+        <Text style={styles.title}>What's Up?</Text>
+      </View>
       <View style={styles.input_wrapper}>
         <TextInput
           style={styles.input}
@@ -32,27 +34,27 @@ export default function Home(props) {
         <View style={styles.colorContainer}>
           <TouchableOpacity
             style={[{ backgroundColor: colors.black }, styles.colorbutton]}
-            onPress={() => setColor(colors.black)}
+            onPress={() => setBgColor(colors.black)}
           />
           <TouchableOpacity
             style={[{ backgroundColor: colors.purple }, styles.colorbutton]}
-            onPress={() => setColor(colors.purple)}
+            onPress={() => setBgColor(colors.purple)}
           />
           <TouchableOpacity
             style={[{ backgroundColor: colors.grey }, styles.colorbutton]}
-            onPress={() => setColor(colors.grey)}
+            onPress={() => setBgColor(colors.grey)}
           />
           <TouchableOpacity
             style={[{ backgroundColor: colors.green }, styles.colorbutton]}
-            onPress={() => setColor(colors.green)}
+            onPress={() => setBgColor(colors.green)}
           />
         </View>
-        <Button
+        {/* Utilize navigation prop from React Navigation library to switch screens */}
+        <Pressable
           style={styles.button}
-          title='Start Chatting'
-          color='#757083'
-          onPress={() => props.navigation.navigate('Chat', { name: name })}
-        />
+          onPress={() => props.navigation.navigate('Chat', { name: name }, { backgroundColor: bgColor })}>
+          <Text style={styles.button_text}>Start Chatting</Text>
+        </Pressable>
 
       </View>
     </View>
