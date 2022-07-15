@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ImageBackground, View, Text, TextInput, TouchableOpacity, Pressable } from 'react-native';
+import { ImageBackground, View, Text, TextInput, TouchableOpacity, Pressable, Platform, KeyboardAvoidingView } from 'react-native';
 import BackgroundImage from '../img/background_image.png';
 import { styles } from '../styles/styles';
 
@@ -55,7 +55,8 @@ export default function Home(props) {
           onPress={() => props.navigation.navigate('Chat', { name: name }, { bgColor: bgColor })}>
           <Text style={styles.button_text}>Start Chatting</Text>
         </Pressable>
-
+        {Platform.OS === 'android' ? <KeyboardAvoidingView behavior="height" /> : null
+        }
       </View>
     </View>
   )
