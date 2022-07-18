@@ -9,6 +9,7 @@ export default function Chat({ route, navigation }) {
 
   const [messages, setMessages] = useState([]);
 
+  //Get params
   let { name, bgColor } = route.params;
 
   // Declare the title of the Chat UI being the name prop
