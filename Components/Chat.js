@@ -5,14 +5,14 @@ import { Button } from 'react-native-paper'
 import Image from '../img/send.png'
 import { styles } from '../styles/styles';
 
-export default function Chat(props) {
+export default function Chat({ route, navigation }) {
 
   const [messages, setMessages] = useState([]);
 
-  let { name, bgColor } = props.route.params;
+  let { name, bgColor } = route.params;
 
   // Declare the title of the Chat UI being the name prop
-  props.navigation.setOptions({ title: name })
+  navigation.setOptions({ title: name })
 
   //run once after component mounts
   useEffect(() => {
@@ -54,6 +54,7 @@ export default function Chat(props) {
       />
     )
   }
+  //Modify the send button to render a costumized button with paperplan icon
   const renderSend = (props) => {
     return (
       <Send

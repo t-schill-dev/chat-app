@@ -67,9 +67,7 @@ const styles = StyleSheet.create({
     },
     image: {
         flex: 1,
-        flexDirection: 'column',
-        justifyContent: 'space-evenly',
-        alignItems: 'center',
+
     },
     // ----------------- CHAT SCREEN -----------------
     // chat_title: {
