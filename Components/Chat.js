@@ -21,7 +21,7 @@ export default function Chat({ route, navigation }) {
       {
         _id: 1,
         text: 'Hello developer',
-        areatedAt: new Date(),
+        createdAt: new Date(),
         user: {
           _id: 2,
           name: 'React Native',
