@@ -4,6 +4,9 @@ import { GiftedChat, Bubble, Send } from 'react-native-gifted-chat';
 import { Button } from 'react-native-paper'
 import Image from '../img/send.png'
 import { styles } from '../styles/styles';
+const firebase = require("firebase");
+// Required for side-effects
+require("firebase/firestore");
 
 export default function Chat({ route, navigation }) {
 
