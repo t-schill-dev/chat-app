@@ -4,9 +4,9 @@ import { GiftedChat, Bubble, Send } from 'react-native-gifted-chat';
 import { Button } from 'react-native-paper'
 import Image from '../img/send.png'
 import { styles } from '../styles/styles';
-const firebase = require("firebase");
-// Required for side-effects
-require("firebase/firestore");
+import { collection } from 'firebase/firestore'
+//import configured Database
+import { db } from "../config/firebase";
 
 export default function Chat({ route, navigation }) {
 
@@ -18,28 +18,48 @@ export default function Chat({ route, navigation }) {
   // Declare the title of the Chat UI being the name prop
   navigation.setOptions({ title: name })
 
+  let messagesCollection = collection(db, 'messages');
+
   //run once after component mounts
   useEffect(() => {
-    setMessages([
-      {
-        _id: 1,
-        text: 'Hello developer',
-        createdAt: new Date(),
-        user: {
-          _id: 2,
-          name: 'React Native',
-          avatar: 'https://placeimg.com/140/140/any'
-        }
-      },
-      {
-        _id: 2,
-        text: 'This is a system message',
-        createdAt: new Date(),
-        system: true,
-      },
-    ])
+    //reference to collection in firebase db
+    referenceMessages = firebase.firestore().collection('messages');
+    unsubscribe = referenceMessages.onSnapshot(onCollectionUpdate);
+    // setMessages([
+    //   {
+    //     _id: 1,
+    //     text: 'Hello developer',
+    //     createdAt: new Date(),
+    //     user: {
+    //       _id: 2,
+    //       name: 'React Native',
+    //       avatar: 'https://placeimg.com/140/140/any'
+    //     }
+    //   },
+    //   {
+    //     _id: 2,
+    //     text: 'This is a system message',
+    //     createdAt: new Date(),
+    //     system: true,
+    //   },
+    // ])
   }, [])
 
+  onCollectionUpdate = (querySnapshot) => {
+    const messages = [];
+    //go through each document
+    querySnapshot.forEach((doc) => {
+      //get QueryDocumentSnapshot data
+      let data = doc.data();
+      messages.push({
+        _id: data._id,
+        text: data.text,
+        createdAt: data.createdAt.toDate(),
+        user: data.user,
+      });
+    });
+    setMessages(messages)
+  }
   //Message gets appended to the GiftedChat
   const onSend = useCallback((messages = []) => {
     setMessages(previousMessages => GiftedChat.append(previousMessages, messages))
@@ -47,6 +67,9 @@ export default function Chat({ route, navigation }) {
 
   //Changing color by inheriting props of function
   const renderBubble = function (props) {
+
+
+
     return (
       <Bubble
         {...props}
