@@ -4,48 +4,59 @@ import { GiftedChat, Bubble, Send } from 'react-native-gifted-chat';
 import { Button } from 'react-native-paper'
 import Image from '../img/send.png'
 import { styles } from '../styles/styles';
-import { collection } from 'firebase/firestore'
+import { collection, getDocs, addDoc } from 'firebase/firestore'
 //import configured Database
 import { db } from "../config/firebase";
+import { getAuth, signInAnonymously, onAuthStateChanged } from 'firebase/auth';
+
+
 
 export default function Chat({ route, navigation }) {
 
   const [messages, setMessages] = useState([]);
+  const [uid, setUid] = useState('');
+  const [text, setText] = useState('');
 
   //Get params
   let { name, bgColor } = route.params;
 
-  // Declare the title of the Chat UI being the name prop
-  navigation.setOptions({ title: name })
+
 
   let messagesCollection = collection(db, 'messages');
 
+  const querySnapshot = getDocs(messagesCollection);
+
+  //Authentication variable
+  const auth = getAuth();
   //run once after component mounts
   useEffect(() => {
-    //reference to collection in firebase db
-    referenceMessages = firebase.firestore().collection('messages');
-    unsubscribe = referenceMessages.onSnapshot(onCollectionUpdate);
-    // setMessages([
-    //   {
-    //     _id: 1,
-    //     text: 'Hello developer',
-    //     createdAt: new Date(),
-    //     user: {
-    //       _id: 2,
-    //       name: 'React Native',
-    //       avatar: 'https://placeimg.com/140/140/any'
-    //     }
-    //   },
-    //   {
-    //     _id: 2,
-    //     text: 'This is a system message',
-    //     createdAt: new Date(),
-    //     system: true,
-    //   },
-    // ])
+    // Declare the title of the Chat UI being the name prop
+    navigation.setOptions({ title: name })
+
+    // listen to authentication events
+    const authUnsubscribe = onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        signInAnonymously(auth);
+      }
+
+      // update user state with user data
+      setUid(user.uid);
+      setText(`User ${user.uid}`);
+      console.log(user.uid);
+    });
+    // listen for collection changes (Update state based on database snapshot)
+    let stopListeningToSnapshots = onSnapshot(onCollectionUpdate);
+    //In here code will run once the component will unmount
+    return () => {
+      // stop listening for changes
+      stopListeningToSnapshots();
+      // stop listening to authentication
+      authUnsubscribe();
+    };
+
   }, [])
 
-  onCollectionUpdate = (querySnapshot) => {
+  const onCollectionUpdate = (querySnapshot) => {
     const messages = [];
     //go through each document
     querySnapshot.forEach((doc) => {
@@ -60,6 +71,19 @@ export default function Chat({ route, navigation }) {
     });
     setMessages(messages)
   }
+
+  // ADD/PUT document(message) to firestore collection
+  const addMessage = (message) => {
+    addDoc(messagesCollection, {
+      _id: message._id,
+      createdAt: message.createdAt,
+      text: message.text || "",
+      user: message.user,
+      image: message.image || null,
+      location: message.location || null,
+    });
+  };
+
   //Message gets appended to the GiftedChat
   const onSend = useCallback((messages = []) => {
     setMessages(previousMessages => GiftedChat.append(previousMessages, messages))
@@ -99,6 +123,7 @@ export default function Chat({ route, navigation }) {
       flex: 1,
       backgroundColor: bgColor
     }}>
+      <Text>{text}</Text>
       <GiftedChat
         renderSend={renderSend}
         renderBubble={renderBubble}
