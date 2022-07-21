@@ -1,13 +1,15 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Platform, KeyboardAvoidingView } from 'react-native';
+import { View, Text, Platform, KeyboardAvoidingView } from 'react-native';
 import { GiftedChat, Bubble, Send } from 'react-native-gifted-chat';
 import { Button } from 'react-native-paper'
 import Image from '../img/send.png'
 import { styles } from '../styles/styles';
-import { collection, getDocs, addDoc } from 'firebase/firestore'
-//import configured Database
+
+const firebase = require("firebase");
+// Required for side-effects
+require("firebase/firestore");
+
 import { db } from "../config/firebase";
-import { getAuth, signInAnonymously, onAuthStateChanged } from 'firebase/auth';
 
 
 
@@ -21,22 +23,17 @@ export default function Chat({ route, navigation }) {
   let { name, bgColor } = route.params;
 
 
-
-  let messagesCollection = collection(db, 'messages');
-
-  const querySnapshot = getDocs(messagesCollection);
-
-  //Authentication variable
-  const auth = getAuth();
   //run once after component mounts
   useEffect(() => {
     // Declare the title of the Chat UI being the name prop
     navigation.setOptions({ title: name })
+    //Using imported firestore(db) from config
+    const referenceCollection = db.collection('messages');
 
     // listen to authentication events
-    const authUnsubscribe = onAuthStateChanged(auth, (user) => {
+    const authUnsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
       if (!user) {
-        signInAnonymously(auth);
+        await firebase.auth().signInAnonymously();
       }
 
       // update user state with user data
@@ -44,9 +41,15 @@ export default function Chat({ route, navigation }) {
       setText(`User ${user.uid}`);
       console.log(user.uid);
     });
+
+    // create a reference to the active user's documents from state
+    let referenceCollectionUser = referenceCollection.where('uid', '==', uid)
+
     // listen for collection changes (Update state based on database snapshot)
-    let stopListeningToSnapshots = onSnapshot(onCollectionUpdate);
-    //In here code will run once the component will unmount
+    let stopListeningToSnapshots = referenceCollection.onSnapshot(onCollectionUpdate);
+
+
+    //In here code will run once the component will unmount (equivalent to compontentWillUnmount)
     return () => {
       // stop listening for changes
       stopListeningToSnapshots();
@@ -68,25 +71,32 @@ export default function Chat({ route, navigation }) {
         createdAt: data.createdAt.toDate(),
         user: data.user,
       });
-    });
+    })
+
     setMessages(messages)
-  }
+  };
 
   // ADD/PUT document(message) to firestore collection
   const addMessage = (message) => {
-    addDoc(messagesCollection, {
+    referenceCollection.add({
       _id: message._id,
       createdAt: message.createdAt,
       text: message.text || "",
       user: message.user,
-      image: message.image || null,
-      location: message.location || null,
-    });
+    })
+      .then((docRef) => {
+        console.log("Document written with ID: ", docRef.id);
+      })
+      .catch((error) => {
+        console.error("Error adding document: ", error);
+      });;
   };
 
-  //Message gets appended to the GiftedChat
-  const onSend = useCallback((messages = []) => {
-    setMessages(previousMessages => GiftedChat.append(previousMessages, messages))
+  //Append new messages to the State and add to firestore collection (addMessage) and asyncStorage (saveMessages)
+  const onSend = useCallback((newMessages = []) => {
+    setMessages(previousMessages => GiftedChat.append(previousMessages, newMessages));
+    //Last message appended to collection
+    addMessage(newMessages[0])
   }, [])
 
   //Changing color by inheriting props of function
@@ -123,14 +133,15 @@ export default function Chat({ route, navigation }) {
       flex: 1,
       backgroundColor: bgColor
     }}>
-      <Text>{text}</Text>
+      <Text></Text>
       <GiftedChat
         renderSend={renderSend}
         renderBubble={renderBubble}
         messages={messages}
         onSend={messages => onSend(messages)}
         user={{
-          _id: 1,
+          _id: uid,
+          name: name,
         }}
       />
       {/* Prevents overlay of keybord on android devices when typing. Use features from react-native */}
