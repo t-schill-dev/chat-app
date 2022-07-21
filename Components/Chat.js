@@ -22,13 +22,14 @@ export default function Chat({ route, navigation }) {
   //Get params
   let { name, bgColor } = route.params;
 
+  const referenceCollection = db.collection('messages');
 
   //run once after component mounts
   useEffect(() => {
     // Declare the title of the Chat UI being the name prop
     navigation.setOptions({ title: name })
     //Using imported firestore(db) from config
-    const referenceCollection = db.collection('messages');
+
 
     // listen to authentication events
     const authUnsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
@@ -109,9 +110,23 @@ export default function Chat({ route, navigation }) {
         {...props}
         wrapperStyle={{
           right: {
-            backgroundColor: '#000'
+            backgroundColor: '#66BFBF',
+          },
+          left: {
+            backgroundColor: '#FEFBF6'
           }
         }}
+        textStyle={{
+          right: {
+            color: '#FEFBF6',
+
+          },
+          left: {
+            color: '#495C83',
+
+          }
+        }}
+
       />
     )
   }
