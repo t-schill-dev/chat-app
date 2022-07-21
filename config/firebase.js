@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore } from 'firebase/firestore'
+import { getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -10,8 +10,7 @@ const firebaseConfig = {
     messagingSenderId: "775330376472",
 };
 
-if (!firebase.apps.length) {
-    const app = initializeApp(firebaseConfig)
-}
+const app = initializeApp(firebaseConfig)
+
 //export to Chat.js
 export const db = getFirestore(app)
