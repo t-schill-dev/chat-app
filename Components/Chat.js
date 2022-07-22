@@ -4,6 +4,7 @@ import { GiftedChat, Bubble, Send } from 'react-native-gifted-chat';
 import { Button } from 'react-native-paper'
 import Image from '../img/send.png'
 import { styles } from '../styles/styles';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const firebase = require("firebase");
 // Required for side-effects
@@ -30,6 +31,7 @@ export default function Chat({ route, navigation }) {
     navigation.setOptions({ title: name })
     //Using imported firestore(db) from config
 
+    getMessages();
 
     // listen to authentication events
     const authUnsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
@@ -58,7 +60,21 @@ export default function Chat({ route, navigation }) {
       authUnsubscribe();
     };
 
-  }, [])
+  }, []);
+
+  // WORKING WITH ASYNCSTORAGE (local storage) //
+  // GET messages from asyncStorage
+async function getMessages () {
+  let msg= '';
+  try {
+    msg = await AsyncStorage.getItem('msg') || [];
+    setMessages({
+      messages: JSON.parse(msg)
+    });
+  } catch (error) {
+    console.log(error.msg)
+  }
+};
 
   const onCollectionUpdate = (querySnapshot) => {
     const messages = [];
