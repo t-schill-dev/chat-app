@@ -69,34 +69,33 @@ return () => {
 };
     }
    })
-  }, [isOnline]);
+  }, []);
 
   
   //WORKING WITH ASYNCSTORAGE (local storage) //
   //GET messages from asyncStorage
   
-async function getLocalMessages () {
+const getLocalMessages = async () => {
   let msg= '';
   try {
-    msg = await AsyncStorage.getItem('msg') || [];
-    setMessages({
-      messages: JSON.parse(msg)
-    });
+    msg = (await AsyncStorage.getItem('messages')) || [];
+    setMessages(JSON.parse(msg));
   } catch (error) {
     console.log(error.msg)
   }
 };
 //ADD message to async Storage
-async function saveMessages() {
+const saveMessages = async () => {
   try {
     await AsyncStorage.setItem('messages', JSON.stringify(messages));
+    console.log('Add to Local storage', messages)
   } catch (error) {
     console.log(error.message)
   }
 }
 
 // DELETE messages from asyncStorage and state
-async function deleteMessages() {
+const deleteMessage = async () => {
   try {
     await AsyncStorage.removeItem('messages');
     setMessages([]);
@@ -140,15 +139,15 @@ async function deleteMessages() {
   };
 
   //Append new messages to the State and add to firestore collection (addMessage) and asyncStorage (saveMessages)
-  const onSend = useCallback((newMessages = []) => {
-    setMessages(previousMessages => ({
-      messages: GiftedChat.append(previousMessages.messages, newMessages),
-    }), () => {
+  const onSend = (newMessages = []) => {
+    setMessages(previousMessages => (
+      GiftedChat.append(previousMessages, newMessages)
+    ));
       saveMessages();
        //Last message appended to collection
       addMessage(newMessages[0])
-    }, [])
-  })
+    };
+  
 
   // Hide input field when offline
   const renderInputToolbar = (props) => {
