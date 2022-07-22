@@ -75,6 +75,24 @@ async function getMessages () {
     console.log(error.msg)
   }
 };
+//ADD message to async Storage
+async function saveMessages() {
+  try {
+    await AsyncStorage.setItem('messages', JSON.stringify(messages));
+  } catch (error) {
+    console.log(error.message)
+  }
+}
+
+// DELETE messages from asyncStorage and state
+async function deleteMessages() {
+  try {
+    await AsyncStorage.removeItem('messages');
+    setMessages([]);
+  } catch (error) {
+    console.log(error.message)
+  }
+}
 
   const onCollectionUpdate = (querySnapshot) => {
     const messages = [];
@@ -93,6 +111,7 @@ async function getMessages () {
     setMessages(messages)
   };
 
+  //Working with firestore
   // ADD/PUT document(message) to firestore collection
   const addMessage = (message) => {
     referenceCollection.add({
@@ -111,10 +130,16 @@ async function getMessages () {
 
   //Append new messages to the State and add to firestore collection (addMessage) and asyncStorage (saveMessages)
   const onSend = useCallback((newMessages = []) => {
-    setMessages(previousMessages => GiftedChat.append(previousMessages, newMessages));
-    //Last message appended to collection
-    addMessage(newMessages[0])
-  }, [])
+    setMessages(previousMessages => ({
+      messages: GiftedChat.append(previousMessages.messages, newMessages),
+    }), () => {
+      saveMessages();
+       //Last message appended to collection
+      addMessage(newMessages[0])
+    }, [])
+  })
+
+
 
   //Changing color by inheriting props of function
   const renderBubble = function (props) {
