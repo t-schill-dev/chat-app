@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, Platform, KeyboardAvoidingView } from 'react-native';
-import { GiftedChat, Bubble, Send } from 'react-native-gifted-chat';
+import { GiftedChat, Bubble, Send, InputToolbar } from 'react-native-gifted-chat';
 import { Button } from 'react-native-paper'
 import Image from '../img/send.png'
 import { styles } from '../styles/styles';
@@ -18,7 +18,7 @@ export default function Chat({ route, navigation }) {
 
   const [messages, setMessages] = useState([]);
   const [uid, setUid] = useState('');
-  const [text, setText] = useState('');
+  const [logInText, setLogInText] = useState('You are online');
   const [isOnline, setOnline] = useState();
 
   //Get params
@@ -36,8 +36,9 @@ export default function Chat({ route, navigation }) {
     
     if(!connection.isConnected) {
       console.log('offline')
+      setLogInText('You are offline')
       //Working with AsyncStoreage to get Messages
-      getMessages();
+      getLocalMessages();
     } else {
       console.log('online')
       //Working with firestore
@@ -49,7 +50,6 @@ const authUnsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
 
   // update user state with user data
   setUid(user.uid);
-  setText(`User ${user.uid}`);
   console.log(user.uid);
 });
 
@@ -71,9 +71,11 @@ return () => {
    })
   }, [isOnline]);
 
-  // WORKING WITH ASYNCSTORAGE (local storage) //
-  // GET messages from asyncStorage
-async function getMessages () {
+  
+  //WORKING WITH ASYNCSTORAGE (local storage) //
+  //GET messages from asyncStorage
+  
+async function getLocalMessages () {
   let msg= '';
   try {
     msg = await AsyncStorage.getItem('msg') || [];
@@ -202,12 +204,13 @@ async function deleteMessages() {
       flex: 1,
       backgroundColor: bgColor
     }}>
-      <Text></Text>
+      <Text>{logInText}</Text>
       <GiftedChat
         renderSend={renderSend}
         renderBubble={renderBubble}
         messages={messages}
         onSend={messages => onSend(messages)}
+        renderInputToolbar={renderInputToolbar}
         user={{
           _id: uid,
           name: name,
