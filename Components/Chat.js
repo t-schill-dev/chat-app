@@ -5,7 +5,7 @@ import { Button } from 'react-native-paper'
 import Image from '../img/send.png'
 import { styles } from '../styles/styles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import NetInfo from "@react-native-community/netinfo";
 const firebase = require("firebase");
 // Required for side-effects
 require("firebase/firestore");
@@ -19,48 +19,57 @@ export default function Chat({ route, navigation }) {
   const [messages, setMessages] = useState([]);
   const [uid, setUid] = useState('');
   const [text, setText] = useState('');
+  const [isOnline, setOnline] = useState();
 
   //Get params
   let { name, bgColor } = route.params;
-
+ //Using imported firestore(db) from config
   const referenceCollection = db.collection('messages');
 
   //run once after component mounts
   useEffect(() => {
     // Declare the title of the Chat UI being the name prop
     navigation.setOptions({ title: name })
-    //Using imported firestore(db) from config
+   //If user is online, retrieve messages from firebase, if offline use AsyncStorage
+   NetInfo.fetch().then((connection) => {
+    setOnline(connection.isConnected);
+    
+    if(!connection.isConnected) {
+      console.log('offline')
+      //Working with AsyncStoreage to get Messages
+      getMessages();
+    } else {
+      console.log('online')
+      //Working with firestore
+// listen to authentication events
+const authUnsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
+  if (!user) {
+    await firebase.auth().signInAnonymously();
+  }
 
-    getMessages();
+  // update user state with user data
+  setUid(user.uid);
+  setText(`User ${user.uid}`);
+  console.log(user.uid);
+});
 
-    // listen to authentication events
-    const authUnsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
-      if (!user) {
-        await firebase.auth().signInAnonymously();
-      }
+// create a reference to the active user's documents from state
+let referenceCollectionUser = referenceCollection.where('uid', '==', uid)
 
-      // update user state with user data
-      setUid(user.uid);
-      setText(`User ${user.uid}`);
-      console.log(user.uid);
-    });
-
-    // create a reference to the active user's documents from state
-    let referenceCollectionUser = referenceCollection.where('uid', '==', uid)
-
-    // listen for collection changes (Update state based on database snapshot)
-    let stopListeningToSnapshots = referenceCollection.onSnapshot(onCollectionUpdate);
+// listen for collection changes (Update state based on database snapshot)
+let stopListeningToSnapshots = referenceCollection.onSnapshot(onCollectionUpdate);
 
 
-    //In here code will run once the component will unmount (equivalent to compontentWillUnmount)
-    return () => {
-      // stop listening for changes
-      stopListeningToSnapshots();
-      // stop listening to authentication
-      authUnsubscribe();
-    };
-
-  }, []);
+//In here code will run once the component will unmount (equivalent to compontentWillUnmount)
+return () => {
+  // stop listening for changes
+  stopListeningToSnapshots();
+  // stop listening to authentication
+  authUnsubscribe();
+};
+    }
+   })
+  }, [isOnline]);
 
   // WORKING WITH ASYNCSTORAGE (local storage) //
   // GET messages from asyncStorage
@@ -139,13 +148,17 @@ async function deleteMessages() {
     }, [])
   })
 
-
+  // Hide input field when offline
+  const renderInputToolbar = (props) => {
+    if (!isOnline) {
+      return <></>;
+    } else {
+      return <InputToolbar {...props} />;
+    }
+  };
 
   //Changing color by inheriting props of function
   const renderBubble = function (props) {
-
-
-
     return (
       <Bubble
         {...props}
