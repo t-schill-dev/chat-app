@@ -130,8 +130,13 @@ export default function Chat({ route, navigation }) {
         _id: data._id,
         text: data.text,
         createdAt: data.createdAt.toDate(),
-        user: data.user,
-      });
+        user: {
+          _id: data.user._id,
+          name: data.user.name,
+        },
+        image: data.image || null,
+        location: data.location || null,
+     });
     });
 
     setMessages(messages);
@@ -142,10 +147,13 @@ export default function Chat({ route, navigation }) {
   const addMessage = (message) => {
     referenceCollection
       .add({
+        uid: uid,
         _id: message._id,
         createdAt: message.createdAt,
         text: message.text || "",
         user: message.user,
+        image: message.image || '',
+        location: message.location || null
       })
       .then((docRef) => {
         console.log("Document written with ID: ", docRef.id);
