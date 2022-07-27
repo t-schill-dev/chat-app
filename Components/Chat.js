@@ -12,19 +12,21 @@ import {
   Send,
   InputToolbar,
 } from "react-native-gifted-chat";
+import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import { Button } from "react-native-paper";
 import Image from "../img/send.png";
 import { styles } from "../styles/styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import NetInfo from "@react-native-community/netinfo";
 import CustomActions from './CustomActions'
+import MapView from "react-native-maps";
 const firebase = require("firebase");
 // Required for side-effects
 import {query, collection, onSnapshot, orderBy } from "firebase/firestore";
 
 import { db } from "../config/firebase";
 
-export default function Chat({ route, navigation, props }) {
+export default function Chat(props) {
   const [messages, setMessages] = useState([]);
   const [uid, setUid] = useState("");
   const [logInText, setLogInText] = useState("You are online");
@@ -33,14 +35,14 @@ export default function Chat({ route, navigation, props }) {
   const [img, setImg] = useState(null);
 
   //Get params
-  let { name, bgColor } = route.params;
+  let { name, bgColor } = props.route.params;
   //Using imported firestore(db) from config
   const referenceCollection = db.collection("messages");
 
   //run once after component mounts
   useEffect(() => {
     // Declare the title of the Chat UI being the name prop
-    navigation.setOptions({ title: name });
+    props.navigation.setOptions({ title: name });
     //If user is online, retrieve messages from firebase, if offline use AsyncStorage
     NetInfo.fetch().then((connection) => {
       setOnline(connection.isConnected);
@@ -102,6 +104,7 @@ export default function Chat({ route, navigation, props }) {
     try {
       msg = (await AsyncStorage.getItem("messages")) || [];
       setMessages(JSON.parse(msg));
+      console.log('Messages fetched from Async Storage')
     } catch (error) {
       console.log(error.msg);
     }
@@ -246,6 +249,7 @@ export default function Chat({ route, navigation, props }) {
   };
 
   return (
+    <ActionSheetProvider>
     <View
       style={{
         flex: 1,
@@ -272,5 +276,6 @@ export default function Chat({ route, navigation, props }) {
         <KeyboardAvoidingView behavior="height" />
       ) : null}
     </View>
+    </ActionSheetProvider>
   );
 }
