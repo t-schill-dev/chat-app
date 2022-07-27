@@ -22,7 +22,7 @@ import CustomActions from './CustomActions'
 import MapView from "react-native-maps";
 const firebase = require("firebase");
 // Required for side-effects
-import {query, collection, onSnapshot, orderBy } from "firebase/firestore";
+import "firebase/firestore";
 
 import { db } from "../config/firebase";
 
@@ -56,11 +56,8 @@ export default function Chat(props) {
         console.log("online");
         //Working with firestore
         // Fetch collection and query on it
-        const messagesQuery = query(
-          messagesCollection,
-          orderBy("createdAt")
-        );
-        
+        const messagesQuery = referenceCollection.orderBy("createdAt");
+        messagesQuery.get()
         // listen to authentication events
         const authUnsubscribe = firebase
           .auth()
@@ -94,7 +91,7 @@ export default function Chat(props) {
         };
       }
     });
-  }, []);
+  }, [isOnline]);
 
   //WORKING WITH ASYNCSTORAGE (local storage) //
   //GET messages from asyncStorage
@@ -192,7 +189,7 @@ export default function Chat(props) {
     }
   };
 //Render imported CustomActions Component
-  const renderCustomActions = () => {
+  const renderCustomActions = (props) => {
     return <CustomActions {...props}/>
   };
 
