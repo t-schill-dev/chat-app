@@ -20,11 +20,11 @@ import NetInfo from "@react-native-community/netinfo";
 import CustomActions from './CustomActions'
 const firebase = require("firebase");
 // Required for side-effects
-require("firebase/firestore");
+import {query, collection, onSnapshot, orderBy } from "firebase/firestore";
 
 import { db } from "../config/firebase";
 
-export default function Chat({ route, navigation }) {
+export default function Chat({ route, navigation, props }) {
   const [messages, setMessages] = useState([]);
   const [uid, setUid] = useState("");
   const [logInText, setLogInText] = useState("You are online");
@@ -53,6 +53,12 @@ export default function Chat({ route, navigation }) {
       } else {
         console.log("online");
         //Working with firestore
+        // Fetch collection and query on it
+        const messagesQuery = query(
+          messagesCollection,
+          orderBy("createdAt")
+        );
+        
         // listen to authentication events
         const authUnsubscribe = firebase
           .auth()
@@ -183,7 +189,7 @@ export default function Chat({ route, navigation }) {
     }
   };
 //Render imported CustomActions Component
-  const renderCustomActions = (props) => {
+  const renderCustomActions = () => {
     return <CustomActions {...props}/>
   };
 

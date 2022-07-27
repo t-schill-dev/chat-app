@@ -21,6 +21,37 @@ export default function CustomActions() {
   const [img, setImg] = useState(null);
   const [location, setLocation] = useState(null);
 
+ //Upload images to firestore
+
+ const imageUpload = async (uri) => {
+  const blob = await new Promise((resolve, reject) => {
+    //Create new instance of request
+    const xhr = new XMLHttpRequest();
+    xhr.onload = function () {
+      resolve(xhr.response);
+    };
+    xhr.onerror = function (e) {
+      console.log(e);
+      reject(new TypeError('Network request failed'));
+    };
+    //Converting into BLOB
+    xhr.responseType = 'blob';
+    xhr.open('GET', uri, true);
+    xhr.send(null);
+  });
+
+  const imageNameBefore = uri.split("/");
+  const imageName = imageNameBefore[imageNameBefore.length - 1];
+//create referenct to firebase storage and use put to store binary large obj
+  const ref = firebase.storage().ref().child(`images/${imageName}`);
+  const snapshot = await ref.put(blob);
+  console.log('Uploaded blob')
+
+  blob.close();
+
+  return await snapshot.ref.getDownloadURL();
+}
+
   //Pick an image from device. Called in Permissions view
   const pickImage = async () => {
     const { status } = await Permissions.askAsync(Permissions.MEDIA_LIBRARY);
@@ -49,6 +80,7 @@ export default function CustomActions() {
 
       if (!result.canceled) {
         setImg(result);
+        props.onSend({ image: imageUrl });
       }
     }
   };
@@ -64,12 +96,12 @@ export default function CustomActions() {
         if (result) {
           console.log(result);
           setLocation(result)
-          // onSend({
-          //   location: {
-          //     longitude: result.coords.longitude,
-          //     latitude: result.coords.latitude,
-          //   },
-          // });
+          props.onSend({
+            location: {
+              longitude: result.coords.longitude,
+              latitude: result.coords.latitude,
+            },
+          });
         }
       }
      } catch (error) {
@@ -116,7 +148,7 @@ export default function CustomActions() {
       onPress={onActionPress}
     >
       <View style={styles.wrapper}>
-        <Text style={styles.iconText}> + </Text>
+        <Text style={styles.iconText}>+</Text>
       </View>
     </TouchableOpacity>
   );
