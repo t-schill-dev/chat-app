@@ -86,7 +86,7 @@ class CustomAction extends React.Component {
   //to get user location
 
   getLocation = async () => {
-    const { status } = await Permissions.askAsync(Permissions.LOCATION_FOREGROUND);
+    const { status } = await Location.requestForegroundPermissionsAsync();
 
     try {
       if (status === 'granted') {
@@ -132,8 +132,8 @@ class CustomAction extends React.Component {
   render() {
     return (
       <TouchableOpacity style={[styles.container]} onPress={this.onActionPress}>
-        <View style={[styles.wrapper, this.props.wrapperStyle]}>
-          <Text style={[styles.iconText, this.props.iconTextStyle]}>+</Text>
+        <View style={styles.wrapper}>
+          <Text style={styles.iconText}>+</Text>
         </View>
       </TouchableOpacity>
     );
