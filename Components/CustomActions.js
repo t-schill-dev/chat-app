@@ -28,7 +28,7 @@ export default function CustomActions() {
     if (status === "granted") {
       let result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      }).catch((error) => cpnsole.log(error));
+      }).catch((error) => console.log(error));
 
       if (!result.canceled) {
         setImg(result);
@@ -63,15 +63,16 @@ export default function CustomActions() {
 
         if (result) {
           console.log(result);
-          onSend({
-            location: {
-              longitude: result.coords.longitude,
-              latitude: result.coords.latitude,
-            },
-          });
+          setLocation(result)
+          // onSend({
+          //   location: {
+          //     longitude: result.coords.longitude,
+          //     latitude: result.coords.latitude,
+          //   },
+          // });
         }
       }
-    } catch (error) {
+     } catch (error) {
       console.error(error);
     }
   };
