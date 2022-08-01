@@ -44,7 +44,7 @@ class CustomAction extends React.Component {
   //to select an existing picture
 
   pickImage = async () => {
-    const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+    const { status } = await Permissions.askAsync(Permissions.MEDIA_LIBRARY);
 
     try {
       if (status === 'granted') {
@@ -54,7 +54,7 @@ class CustomAction extends React.Component {
 
         if (!result.cancelled) {
           const imageUrl = await this.imageUpload(result.uri);
-          this.props.onSend({ image: imageUrl });
+          this.props.onSend({ img: imageUrl });
         }
       }
     } catch (error) {
@@ -75,7 +75,7 @@ class CustomAction extends React.Component {
 
         if (!result.cancelled) {
           const imageUrl = await this.imageUpload(result.uri);
-          this.props.onSend({ image: imageUrl });
+          this.props.onSend({ img: imageUrl });
         }
       }
     } catch (error) {
