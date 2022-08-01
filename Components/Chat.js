@@ -8,7 +8,9 @@ import {
 import { GiftedChat, Bubble, InputToolbar, Send } from "react-native-gifted-chat";
 import { db } from "../config/firebase";
 import { onSnapshot} from "firebase/firestore";
-import { signInAnonymously, onAuthStateChanged } from "firebase/auth";
+const firebase = require("firebase");
+// Required for side-effects
+import "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import NetInfo from "@react-native-community/netinfo";
 // Communication features
@@ -26,7 +28,7 @@ export default function Chat(props) {
   let { name, bgColor } = props.route.params;
   const [messages, setMessages] = useState([]);
   const [uid, setUid] = useState("");
-  const [loggedInText, setText] = useState("");
+  const [logInText, setLogInText] = useState("You are online");
   const [isOnline, setOnline] = useState();
 
 
@@ -50,22 +52,24 @@ export default function Chat(props) {
         messagesQuery.get()
 
         // listen to authentication events
-        const authUnsubscribe = onAuthStateChanged(auth, (user) => {
-          if (!user) {
-            signInAnonymously(auth);
-          }
+        const authUnsubscribe = firebase
+          .auth()
+          .onAuthStateChanged(async (user) => {
+            if (!user) {
+              await firebase.auth().signInAnonymously();
+            }
 
-          // update user state with user data
-          setUid(user.uid);
-          setText(`User ${user.uid}`);
-          console.log(user.uid);
-        });
+            // update user state with user data
+            setUid(user.uid);
+            console.log(user.uid);
+          });
 
         // listen for collection changes (Update state based on database snapshot)
         let stopListeningToSnapshots = onSnapshot(
           messagesQuery,
           onCollectionUpdate
         );
+        
 
         //In here code will run once the component will unmount
         return () => {
@@ -232,7 +236,7 @@ const renderSend = (props) => {
           backgroundColor: bgColor,
         }}
       >
-        <Text>{loggedInText}</Text>
+         <Text>{logInText}</Text>
         {/* Chat UI */}
         <GiftedChat
           renderSend={renderSend}
