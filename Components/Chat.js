@@ -55,9 +55,7 @@ export default function Chat(props) {
       } else {
         console.log("online");
         //Working with firestore
-        // Fetch collection and query on it
-        const messagesQuery = referenceCollection.orderBy("createdAt");
-        messagesQuery.get()
+        
         // listen to authentication events
         const authUnsubscribe = firebase
           .auth()
@@ -80,7 +78,7 @@ export default function Chat(props) {
 
         // listen for collection changes (Update state based on database snapshot)
         let stopListeningToSnapshots =
-          referenceCollection.onSnapshot(onCollectionUpdate);
+          referenceCollection.orderBy("createdAt").onSnapshot(onCollectionUpdate);
 
         //In here code will run once the component will unmount (equivalent to compontentWillUnmount)
         return () => {
@@ -127,12 +125,12 @@ export default function Chat(props) {
   };
 
   const onCollectionUpdate = (querySnapshot) => {
-    const messages = [];
+    const mess = [];
     //go through each document
     querySnapshot.forEach((doc) => {
       //get QueryDocumentSnapshot data
       let data = doc.data();
-      messages.push({
+      mess.push({
         _id: data._id,
         text: data.text,
         createdAt: data.createdAt.toDate(),
@@ -145,7 +143,7 @@ export default function Chat(props) {
      });
     });
 
-    setMessages(messages);
+    setMessages(mess);
   };
 
   //Working with firestore
