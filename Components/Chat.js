@@ -78,7 +78,7 @@ export default function Chat(props) {
 
         // listen for collection changes (Update state based on database snapshot)
         let stopListeningToSnapshots =
-          referenceCollection.orderBy("createdAt").onSnapshot(onCollectionUpdate);
+          referenceCollection.orderBy("createdAt", 'desc').onSnapshot(onCollectionUpdate);
 
         //In here code will run once the component will unmount (equivalent to compontentWillUnmount)
         return () => {
